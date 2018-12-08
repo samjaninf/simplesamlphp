@@ -99,7 +99,7 @@ class ScopeFromAttributeTest extends TestCase
         ];
         $result = self::processFilter($config, $request);
         $attributes = $result['Attributes'];
-        $this->assertEquals($attributes['scope'], ['example.com']);
+        $this->assertEquals($attributes['scope'], ['doe@example.com']);
     }
 
     /*

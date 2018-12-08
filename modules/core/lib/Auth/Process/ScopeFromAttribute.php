@@ -82,10 +82,10 @@ class ScopeFromAttribute extends \SimpleSAML\Auth\ProcessingFilter
             $attributes[$this->targetAttribute] = [];
             $scope = substr($sourceAttrVal, $scopeIndex + 1);
             $attributes[$this->targetAttribute][] = $scope;
-            SimpleSAML\Logger::debug('ScopeFromAttribute: Inserted new attribute '.
+            \SimpleSAML\Logger::debug('ScopeFromAttribute: Inserted new attribute '.
                                      $this->targetAttribute.', with scope '.$scope);
         } else {
-            SimpleSAML\Logger::warning('ScopeFromAttribute: The configured source attribute '.
+            \SimpleSAML\Logger::warning('ScopeFromAttribute: The configured source attribute '.
                                        $this->sourceAttribute.
                                        ' does not have a scope. Did not add attribute '.
                                        $this->targetAttribute.'.');
