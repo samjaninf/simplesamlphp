@@ -36,27 +36,31 @@ cd $TARGET
 git checkout $TAG
 cd ..
 
-# Use composer only on newer versions that have a composer.json
-if [ -f "$TARGET/composer.json" ]; then
-    if [ ! -x "$TARGET/composer.phar" ]; then
-        curl -sS https://getcomposer.org/installer | php -- --install-dir=$TARGET
-    fi
-
-    # Install dependencies (without vcs history or dev tools)
-    php "$TARGET/composer.phar" install --no-dev --prefer-dist -o -d "$TARGET"
+if [ ! -x "$TARGET/composer.phar" ]; then
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=$TARGET
 fi
 
-mkdir -p "$TARGET/config" "$TARGET/metadata" "$TARGET/cert" "$TARGET/log"
+# Install dependencies (without vcs history or dev tools)
+php "$TARGET/composer.phar" install --no-dev --prefer-dist -o -d "$TARGET"
+
+npm install
+npm audit fix
+npm run build
+
+mkdir -p "$TARGET/config" "$TARGET/metadata" "$TARGET/cert" "$TARGET/log" "$TARGET/data"
 cp -rv "$TARGET/config-templates/"* "$TARGET/config/"
 cp -rv "$TARGET/metadata-templates/"* "$TARGET/metadata/"
 rm -rf "$TARGET/.git"
 rm "$TARGET/.coveralls.yml"
-rm "$TARGET/.travis.yml"
-rm "$TARGET/.gitignore"
 rm "$TARGET/.editorconfig"
+rm "$TARGET/.gitattributes"
+rm "$TARGET/.php_cs.dist"
+rm "$TARGET/.travis.yml"
+rm "$TARGET/psalm.xml"
+rm "$TARGET"/{,modules}/.gitignore
+rm "$TARGET"/{cache,config,metadata,locales}/.gitkeep
 rm "$TARGET/composer.phar"
 tar --owner 0 --group 0 -cvzf "$TARGET.tar.gz" "$TARGET"
 rm -rf "$TARGET"
 
 echo "Created: /tmp/$TARGET.tar.gz"
-

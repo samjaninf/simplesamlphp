@@ -1,8 +1,8 @@
 SimpleSAMLphp Maintenance
 =========================
 
-<!-- 
-	This file is written in Markdown syntax. 
+<!--
+	This file is written in Markdown syntax.
 	For more information about how to use the Markdown syntax, read here:
 	http://daringfireball.net/projects/markdown/syntax
 -->
@@ -13,12 +13,12 @@ SimpleSAMLphp Maintenance
 SimpleSAMLphp news and documentation
 ------------------------------------
 
-This document is part of the SimpleSAMLphp documentation suite.
+Please check the following sources of information to stay up to date with regard to SimpleSAMLphp:
 
- * [List of all SimpleSAMLphp documentation](http://simplesamlphp.org/docs)
+ * [SimpleSAMLphp documentation](http://simplesamlphp.org/docs)
  * [SimpleSAMLphp homepage](https://simplesamlphp.org)
-
-
+ * [SimpleSAMLphp mailing lists](https://simplesamlphp.org/lists)
+ * [SimpleSAMLphp in twitter](https://twitter.com/simplesamlphp)
 
 ## Session management
 
@@ -29,8 +29,9 @@ The `store.type` configuration option in `config.php` allows you to select which
   * `phpsession` uses the built in session management in PHP. This is the default, and is simplest to use. It will not work in a load-balanced environment in most configurations.
   * `memcache` uses the memcache software to cache sessions in memory. Sessions can be distributed and replicated among several memcache servers, enabling both load-balancing and fail-over.
   * `sql` stores the session in an SQL database.
+  * `redis` stores the session in Redis.
 
-	'store.type' => 'phpsession',
+    'store.type' => 'phpsession',
 
 ### Configuring PHP sessions
 
@@ -41,17 +42,17 @@ To use the PHP session handler, set the `store.type` configuration option in `co
 Keep in mind that **PHP does not allow two sessions to be open at the same time**. This means if you are using PHP sessions both in your
 application and in SimpleSAMLphp at the same time, **they need to have different names**. When using the PHP session handler in
 SimpleSAMLphp, it is configured with different options than for other session handlers:
- 
+
     'session.phpsession.cookiename' => null,
     'session.phpsession.savepath' => null,
     'session.phpsession.httponly' => true,
-    
+
 Make sure to set `session.phpsession.cookiename` to a name different than the one in use by any other applications. If you are using
 SimpleSAMLphp as an Identity Provider, or any other applications using it are not using the default session name, you can use the default
 settings by leaving these options unset or setting them to `null`.
 
 If you need to restore your session's application after calling SimpleSAMLphp, you can do it by calling the `cleanup()` method of the
-`SimpleSAML_Session` class, like described [here](simplesamlphp-sp#section_6).
+`\SimpleSAML\Session` class, like described [here](simplesamlphp-sp#section_6).
 
 ### Configuring memcache
 
@@ -95,26 +96,26 @@ Here are two examples of configuration of memcache session handling:
 
 Example of redundant configuration with load balancing: This configuration makes it possible to lose both servers in the a-group or both servers in the b-group without losing any sessions. Note that sessions will be lost if one server is lost from both the a-group and the b-group.
 
-    'memcache_store.servers' => array(
-      array(
-        array('hostname' => 'mc_a1'),
-        array('hostname' => 'mc_a2'),
-      ),
-      array(
-        array('hostname' => 'mc_b1'),
-        array('hostname' => 'mc_b2'),
-      ),
-    ),
+    'memcache_store.servers' => [
+      [
+        ['hostname' => 'mc_a1'],
+        ['hostname' => 'mc_a2'],
+      ],
+      [
+        ['hostname' => 'mc_b1'],
+        ['hostname' => 'mc_b2'],
+      ],
+    ],
 
 **Example&nbsp;2.&nbsp;Example of simple configuration with only one memcache server**
 
 Example of simple configuration with only one memcache server, running on the same computer as the web server: Note that all sessions will be lost if the memcache server crashes.
 
-    'memcache_store.servers' => array(
-      array(
-        array('hostname' => 'localhost'),
-      ),
-    ),
+    'memcache_store.servers' => [
+      [
+        ['hostname' => 'localhost'],
+      ],
+    ],
 
 The expiration value (`memcache_store.expires`) is the duration for which data should be retained in memcache. Data are dropped from the memcache servers when this time expires. The time will be reset every time the data is written to the memcache servers.
 
@@ -156,6 +157,46 @@ Username and password for accessing the database can be configured in the `store
 
 The required tables are created automatically. If you are storing data from multiple separate SimpleSAMLphp installations in the same database, you can use the `store.sql.prefix` option to prevent conflicts.
 
+### Configuring Redis storage
+
+To store sessions in Redis, set the `store.type` option to `redis`.
+
+By default SimpleSAMLphp will attempt to connect to Redis on the `localhost` at port `6379`. These can be configured via the `store.redis.host` and `store.redis.port` options, respectively. You may also set a key prefix with the `store.redis.prefix` option.
+
+## Metadata storage
+
+Several metadata storage backends are available by default, including `flatfile`, `serialize`, `mdq` and
+[`pdo`](https://simplesamlphp.org/docs/stable/simplesamlphp-metadata-pdostoragehandler). Here you have an
+example configuration of different metadata sources in use at the same time:
+
+```
+'metadata.sources' => [
+    ['type' => 'flatfile'],
+    ['type' => 'flatfile', 'directory' => 'metadata/metarefresh-kalmar'],
+    ['type' => 'serialize', 'directory' => 'metadata/metarefresh-ukaccess'],
+],
+```
+
+You may also implement your own metadata storage handler, in a very similar way to how you would implement
+your own session handler. Your class **must** extend the `\SimpleSAML\Metadata\MetaDataStorageSource` class
+and override the methods needed to change the backend used. This class **must** also be located in the
+`lib/MetadataStore/` directory of your custom module.
+
+Bear in mind that **your class name must follow the PSR-0 autoloading standard**. This means it needs to be
+named in a particular way, with the use of namespaces being the preferred convention. For example, if your
+module is named _mymodule_ and your class is named _MyMetadataHandler_, you should define it like this: 
+
+```
+<?php
+namespace SimpleSAML\Module\mymodule\MetadataStore;
+
+class MyMetadataHandler extends \SimpleSAML\Metadata\MetaDataStorageSource
+{
+    ...
+```
+
+If you would like to see an example of how a custom handler could be implemented in your own module, take
+a look at the [cassandrastore](https://github.com/feideconnect/simplesamlphp-module-cassandrastore) module.
 
 ## Logging and statistics
 
@@ -164,7 +205,16 @@ alternative, you may log to flat files.
 
 ## Apache configuration
 
+Basic Apache configuration is described in [SimpleSAMLphp Installation](simplesamlphp-install#section_6).
+However, your IdP or SP is most likely a valuable website that you want to configure securely. Here are some checks.
 
+* Make sure you use HTTPS with a proper certificate. The best way is to not
+  serve anything over plain HTTP, except for a possible redirect to https.
+* Configure your TLS/SSL to be secure. Mozilla has an easy way to generate
+  [Recommended Server Configurations](https://wiki.mozilla.org/Security/Server_Side_TLS#Recommended_Server_Configurations).
+  Verify your SSL settings, e.g. with the [SSLLabs SSLtest](https://www.ssllabs.com/ssltest/).
+* In your Apache configuration, add headers that further secure your site.
+  A good check with hints on what to add is [Mozilla Observatory](https://observatory.mozilla.org/).
 
 ## PHP configuration
 
@@ -176,7 +226,7 @@ Turn off PHPSESSID in query string.
 
 Here are some checkpoints
 
- 1. Remove all entities in metadata files that you do not trust. It is easy to forget about some of the entities that were used for test. 
+ 1. Remove all entities in metadata files that you do not trust. It is easy to forget about some of the entities that were used for test.
  2. If you during testing have been using a certificate that has been exposed (notably: the one found in the SimpleSAMLphp distribution): Obtain and install a new one.
  3. Make sure you have installed the latest security upgrades for your OS.
  4. Make sure to use HTTPS rather than HTTP.
@@ -195,7 +245,7 @@ To add support for a new language, add your new language to the `language.availa
 	/*
 	 * Languages available and which language is default
 	 */
-	'language.available' => array('en', 'no', 'da', 'es', 'xx'),
+	'language.available' => ['en', 'no', 'da', 'es', 'xx'],
 	'language.default'   => 'en',
 
 Please use the standardized two-character
@@ -203,17 +253,13 @@ Please use the standardized two-character
 
 You also can set the default language. You should ensure that the default language is complete, as it is used as a fallback when a text is not available in the language selected by the user.
 
-Translation of SimpleSAMLphp is done through the SimpleSAMLphp translation portal. To translate SimpleSAMLphp to a new language, please contact the authors at the mailing list, and the new language may be added to the translation portal.
-
-  * [Visit the SimpleSAMLphp translation portal](https://translation.rnd.feide.no/?aid=simplesamlphp)
-
 All strings that can be localized are found in the files `dictionaries/`. Add a new entry for each string, with your language code, like this:
 
-    'user_pass_header' => array(
+    'user_pass_header' => [
         'en' => 'Enter your username and password',
         'no' => 'Skriv inn brukernavn og passord',
         'xx' => 'Pooa jujjique jamba',
-      ),
+      ],
 
 You can translate as many of the texts as you would like; a full translation is not required unless you want to make this the default language. From the end users point of view, it looks best if all text fragments used in a given screen or form is in one single language.
 

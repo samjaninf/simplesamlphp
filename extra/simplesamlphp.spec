@@ -1,6 +1,6 @@
 %define name      simplesamlphp
 %define summary   SAML IDP/SP written in PHP
-%define version   1.14.8
+%define version   dev
 %define release   1
 %define license   LGPL 2.1
 %define group     Networking/WWW
@@ -18,7 +18,7 @@ License:   %{license}
 Group:     %{group}
 Source0:   %{source}
 BuildArch: noarch
-Requires:  httpd, mod_ssl, mod_php, php-ldap, php-mcrypt, php-xml, policycoreutils-python
+Requires:  httpd, mod_ssl, mod_php, php-ldap, php-xml, policycoreutils-python
 Requires(pre): shadow-utils
 Provides:  %{name}
 URL:       %{url}

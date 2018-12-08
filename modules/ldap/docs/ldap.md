@@ -63,6 +63,12 @@ authentication source:
 		 */
 		'search.base' => 'ou=people,dc=example,dc=org',
 
+                /*
+                 * The scope of the search. Valid values are 'subtree' and 'onelevel' and 'base',
+                 * first one being the default if no value is set.
+                 */
+                'search.scope' => 'subtree',
+
 		/*
 		 * The attribute(s) the username should match against.
 		 *
@@ -94,7 +100,7 @@ You also need to update the `hostname` and `dnpattern` options. The
 `hostname` should be the hostname of your LDAP server, and the
 `dnpattern` should be a pattern which can be used to generate the `dn`
 of a user with a given username.
-
+-
 All other options have default values, and are not required.
 
 ### Searching for a user ###
@@ -462,13 +468,15 @@ a listing of all configuration options and their details.
 		 * that most products have a special query to recursively search
 		 * group membership.
 		 *
-		 * Note: Only ActiveDirectory is currently supported.
+		 * Note: Only ActiveDirectory is currently supported 
+		 * (OpenLDAP is implemented but not supported, see example below).
 		 *
 		 * Default: ''
 		 * Required: No
 		 */
 		'ldap.product' => '',
 		'ldap.product' => 'ActiveDirectory',
+		'ldap.product' => 'OpenLDAP',
 
 
 		/**
@@ -559,3 +567,15 @@ required, see the config info above for details.
 		'ldap.basedn' => 'DC=example,DC=org'
 	)
 
+Example for unsupported OpenLDAP usage. 
+Intention is to filter in `ou=groups,dc=example,dc=com` for
+`(memberUid = <UID>)` and take only the attribute `cn` (=name of the group).
+
+    50 => array(
+        'class' => 'ldap:AttributeAddUsersGroups',
+        'ldap.product' => 'OpenLDAP',
+        'ldap.basedn' => 'ou=groups,dc=example,dc=org',
+        'attribute.username' => 'uid',
+        'attribute.member' => 'cn',
+        'attribute.memberof' => 'memberUid',
+    ),
