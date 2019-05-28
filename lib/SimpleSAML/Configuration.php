@@ -5,6 +5,7 @@ namespace SimpleSAML;
 use SAML2\Constants;
 use SimpleSAML\Error;
 use SimpleSAML\Utils;
+use Webmozart\Assert\Assert;
 
 /**
  * Configuration of SimpleSAMLphp
@@ -91,8 +92,8 @@ class Configuration implements Utils\ClearableState
      */
     public function __construct($config, $location)
     {
-        assert(is_array($config));
-        assert(is_string($location));
+        Assert::isArray($config);
+        Assert::string($location);
 
         $this->configuration = $config;
         $this->location = $location;
@@ -111,8 +112,8 @@ class Configuration implements Utils\ClearableState
      */
     private static function loadFromFile($filename, $required)
     {
-        assert(is_string($filename));
-        assert(is_bool($required));
+        Assert::string($filename);
+        Assert::boolean($required);
 
         if (array_key_exists($filename, self::$loadedConfigs)) {
             return self::$loadedConfigs[$filename];
@@ -194,8 +195,8 @@ class Configuration implements Utils\ClearableState
      */
     public static function setConfigDir($path, $configSet = 'simplesaml')
     {
-        assert(is_string($path));
-        assert(is_string($configSet));
+        Assert::string($path);
+        Assert::string($configSet);
 
         self::$configDirs[$configSet] = $path;
     }
@@ -217,8 +218,8 @@ class Configuration implements Utils\ClearableState
         $filename = 'config.php',
         $configSet = 'simplesaml'
     ) {
-        assert(is_string($filename));
-        assert(is_string($configSet));
+        Assert::string($filename);
+        Assert::string($configSet);
 
         if (!array_key_exists($configSet, self::$configDirs)) {
             if ($configSet !== 'simplesaml') {
@@ -246,8 +247,8 @@ class Configuration implements Utils\ClearableState
      */
     public static function getConfig($filename = 'config.php', $configSet = 'simplesaml')
     {
-        assert(is_string($filename));
-        assert(is_string($configSet));
+        Assert::string($filename);
+        Assert::string($configSet);
 
         if (!array_key_exists($configSet, self::$configDirs)) {
             if ($configSet !== 'simplesaml') {
@@ -276,8 +277,8 @@ class Configuration implements Utils\ClearableState
      */
     public static function getOptionalConfig($filename = 'config.php', $configSet = 'simplesaml')
     {
-        assert(is_string($filename));
-        assert(is_string($configSet));
+        Assert::string($filename);
+        Assert::string($configSet);
 
         if (!array_key_exists($configSet, self::$configDirs)) {
             if ($configSet !== 'simplesaml') {
@@ -306,8 +307,8 @@ class Configuration implements Utils\ClearableState
      */
     public static function loadFromArray($config, $location = '[ARRAY]', $instance = null)
     {
-        assert(is_array($config));
-        assert(is_string($location));
+        Assert::isArray($config);
+        Assert::string($location);
 
         $c = new Configuration($config, $location);
         if ($instance !== null) {
@@ -334,7 +335,7 @@ class Configuration implements Utils\ClearableState
      */
     public static function getInstance($instancename = 'simplesaml')
     {
-        assert(is_string($instancename));
+        Assert::string($instancename);
 
         // check if the instance exists already
         if (array_key_exists($instancename, self::$instance)) {
@@ -370,9 +371,9 @@ class Configuration implements Utils\ClearableState
      */
     public static function init($path, $instancename = 'simplesaml', $configfilename = 'config.php')
     {
-        assert(is_string($path));
-        assert(is_string($instancename));
-        assert(is_string($configfilename));
+        Assert::string($path);
+        Assert::string($instancename);
+        Assert::string($configfilename);
 
         if ($instancename === 'simplesaml') {
             // for backwards compatibility
@@ -403,9 +404,9 @@ class Configuration implements Utils\ClearableState
      */
     public function copyFromBase($instancename, $filename)
     {
-        assert(is_string($instancename));
-        assert(is_string($filename));
-        assert($this->filename !== null);
+        Assert::string($instancename);
+        Assert::string($filename);
+        Assert::notNull($this->filename);
 
         // check if we already have loaded the given config - return the existing instance if we have
         if (array_key_exists($instancename, self::$instance)) {
@@ -579,7 +580,7 @@ class Configuration implements Utils\ClearableState
             return null;
         }
 
-        assert(is_string($path));
+        Assert::string($path);
 
         return Utils\System::resolvePath($path, $this->getBaseDir());
     }
@@ -640,13 +641,13 @@ class Configuration implements Utils\ClearableState
 
         // the directory wasn't set in the configuration file, path is <base directory>/lib/SimpleSAML/Configuration.php
         $dir = __FILE__;
-        assert(basename($dir) === 'Configuration.php');
+        Assert::same(basename($dir), 'Configuration.php');
 
         $dir = dirname($dir);
-        assert(basename($dir) === 'SimpleSAML');
+        Assert::same(basename($dir), 'SimpleSAML');
 
         $dir = dirname($dir);
-        assert(basename($dir) === 'lib');
+        Assert::same(basename($dir), 'lib');
 
         $dir = dirname($dir);
 
@@ -675,7 +676,7 @@ class Configuration implements Utils\ClearableState
      */
     public function getBoolean($name, $default = self::REQUIRED_OPTION)
     {
-        assert(is_string($name));
+        Assert::string($name);
 
         $ret = $this->getValue($name, $default);
 
@@ -713,7 +714,7 @@ class Configuration implements Utils\ClearableState
      */
     public function getString($name, $default = self::REQUIRED_OPTION)
     {
-        assert(is_string($name));
+        Assert::string($name);
 
         $ret = $this->getValue($name, $default);
 
@@ -751,7 +752,7 @@ class Configuration implements Utils\ClearableState
      */
     public function getInteger($name, $default = self::REQUIRED_OPTION)
     {
-        assert(is_string($name));
+        Assert::string($name);
 
         $ret = $this->getValue($name, $default);
 
@@ -793,9 +794,9 @@ class Configuration implements Utils\ClearableState
      */
     public function getIntegerRange($name, $minimum, $maximum, $default = self::REQUIRED_OPTION)
     {
-        assert(is_string($name));
-        assert(is_int($minimum));
-        assert(is_int($maximum));
+        Assert::string($name);
+        Assert::integer($minimum);
+        Assert::integer($maximum);
 
         $ret = $this->getInteger($name, $default);
 
@@ -839,8 +840,8 @@ class Configuration implements Utils\ClearableState
      */
     public function getValueValidate($name, $allowedValues, $default = self::REQUIRED_OPTION)
     {
-        assert(is_string($name));
-        assert(is_array($allowedValues));
+        Assert::string($name);
+        Assert::isArray($allowedValues);
 
         $ret = $this->getValue($name, $default);
         if ($ret === $default) {
@@ -884,7 +885,7 @@ class Configuration implements Utils\ClearableState
      */
     public function getArray($name, $default = self::REQUIRED_OPTION)
     {
-        assert(is_string($name));
+        Assert::string($name);
 
         $ret = $this->getValue($name, $default);
 
@@ -915,7 +916,7 @@ class Configuration implements Utils\ClearableState
      */
     public function getArrayize($name, $default = self::REQUIRED_OPTION)
     {
-        assert(is_string($name));
+        Assert::string($name);
 
         $ret = $this->getValue($name, $default);
 
@@ -948,7 +949,7 @@ class Configuration implements Utils\ClearableState
      */
     public function getArrayizeString($name, $default = self::REQUIRED_OPTION)
     {
-        assert(is_string($name));
+        Assert::string($name);
 
         $ret = $this->getArrayize($name, $default);
 
@@ -990,7 +991,7 @@ class Configuration implements Utils\ClearableState
      */
     public function getConfigItem($name, $default = self::REQUIRED_OPTION)
     {
-        assert(is_string($name));
+        Assert::string($name);
 
         $ret = $this->getValue($name, $default);
 
@@ -1031,7 +1032,7 @@ class Configuration implements Utils\ClearableState
      */
     public function getConfigList($name, $default = self::REQUIRED_OPTION)
     {
-        assert(is_string($name));
+        Assert::string($name);
 
         $ret = $this->getValue($name, $default);
 
@@ -1100,7 +1101,7 @@ class Configuration implements Utils\ClearableState
      */
     private function getDefaultBinding($endpointType)
     {
-        assert(is_string($endpointType));
+        Assert::string($endpointType);
 
         $set = $this->getString('metadata-set');
         switch ($set.':'.$endpointType) {
@@ -1133,7 +1134,7 @@ class Configuration implements Utils\ClearableState
      */
     public function getEndpoints($endpointType)
     {
-        assert(is_string($endpointType));
+        Assert::string($endpointType);
 
         $loc = $this->location.'['.var_export($endpointType, true).']:';
 
@@ -1214,7 +1215,7 @@ class Configuration implements Utils\ClearableState
      */
     public function getEndpointPrioritizedByBinding($endpointType, array $bindings, $default = self::REQUIRED_OPTION)
     {
-        assert(is_string($endpointType));
+        Assert::string($endpointType);
 
         $endpoints = $this->getEndpoints($endpointType);
 
@@ -1249,7 +1250,7 @@ class Configuration implements Utils\ClearableState
      */
     public function getDefaultEndpoint($endpointType, array $bindings = null, $default = self::REQUIRED_OPTION)
     {
-        assert(is_string($endpointType));
+        Assert::string($endpointType);
 
         $endpoints = $this->getEndpoints($endpointType);
 
@@ -1282,7 +1283,7 @@ class Configuration implements Utils\ClearableState
      */
     public function getLocalizedString($name, $default = self::REQUIRED_OPTION)
     {
-        assert(is_string($name));
+        Assert::string($name);
 
         $ret = $this->getValue($name, $default);
         if ($ret === $default) {
@@ -1330,8 +1331,8 @@ class Configuration implements Utils\ClearableState
      */
     public function getPublicKeys($use = null, $required = false, $prefix = '')
     {
-        assert(is_bool($required));
-        assert(is_string($prefix));
+        Assert::boolean($required);
+        Assert::string($prefix);
 
         if ($this->hasValue($prefix.'keys')) {
             $ret = [];

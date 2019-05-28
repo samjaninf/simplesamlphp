@@ -4,6 +4,7 @@ namespace SimpleSAML\Module\core\Stats\Output;
 
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
+use Webmozart\Assert\Assert;
 
 /**
  * Statistics logger that writes to a set of log files
@@ -57,7 +58,7 @@ class File extends \SimpleSAML\Stats\Output
      */
     private function openLog($date)
     {
-        assert(is_string($date));
+        Assert::string($date);
 
         if ($this->file !== null && $this->file !== false) {
             fclose($this->file);
@@ -85,7 +86,7 @@ class File extends \SimpleSAML\Stats\Output
      */
     public function emit(array $data)
     {
-        assert(isset($data['time']));
+        Assert::notNull($data['time']);
 
         if ($this->file === false || $this->file === null) {
             throw new Error\Exception('Error opening log file:  invalid handle');

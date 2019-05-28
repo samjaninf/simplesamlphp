@@ -18,6 +18,7 @@ use SimpleSAML\Error;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
 use SimpleSAML\Utils;
 use SimpleSAML\XML\Validator;
+use Webmozart\Assert\Assert;
 
 class AuthnResponse
 {
@@ -60,7 +61,7 @@ class AuthnResponse
      */
     public function setMessageValidated($messageValidated)
     {
-        assert(is_bool($messageValidated));
+        Assert::boolean($messageValidated);
 
         $this->messageValidated = $messageValidated;
     }
@@ -73,7 +74,7 @@ class AuthnResponse
      */
     public function setXML($xml)
     {
-        assert(is_string($xml));
+        Assert::string($xml);
 
         try {
             $this->dom = DOMDocumentFactory::fromString(str_replace("\r", "", $xml));
@@ -108,7 +109,7 @@ class AuthnResponse
      */
     public function validate()
     {
-        assert($this->dom instanceof DOMDocument);
+        Assert::isInstanceOf($this->dom, DOMDocument::class);
 
         if ($this->messageValidated) {
             // This message was validated externally
@@ -175,7 +176,7 @@ class AuthnResponse
             $node = dom_import_simplexml($node);
         }
 
-        assert($node instanceof DOMNode);
+        Assert::isInstanceOf($node, DOMNode::class);
 
         return $this->validator->isNodeValidated($node);
     }
@@ -191,14 +192,14 @@ class AuthnResponse
      */
     private function doXPathQuery($query, $node = null)
     {
-        assert(is_string($query));
-        assert($this->dom instanceof DOMDocument);
+        Assert::string($query);
+        Assert::isInstanceOf($this->dom, DOMDocument::class);
 
         if ($node === null) {
             $node = $this->dom->documentElement;
         }
 
-        assert($node instanceof DOMNode);
+        Assert::isInstanceOf($node, DOMNode::class);
 
         $xPath = new DOMXpath($this->dom);
         $xPath->registerNamespace('shibp', self::SHIB_PROTOCOL_NS);
@@ -215,7 +216,7 @@ class AuthnResponse
      */
     public function getSessionIndex()
     {
-        assert($this->dom instanceof DOMDocument);
+        Assert::isInstanceOf($this->dom, DOMDocument::class);
 
         $query = '/shibp:Response/shib:Assertion/shib:AuthnStatement';
         $nodelist = $this->doXPathQuery($query);
@@ -354,8 +355,8 @@ class AuthnResponse
      */
     public function generate(Configuration $idp, Configuration $sp, $shire, $attributes)
     {
-        assert(is_string($shire));
-        assert($attributes === null || is_array($attributes));
+        Assert::string($shire);
+        Assert::nullOrArray($attributes);
 
         if ($sp->hasValue('scopedattributes')) {
             $scopedAttributes = $sp->getArray('scopedattributes');
@@ -452,12 +453,10 @@ class AuthnResponse
      * @param array $scopedAttributes  Array of attributes names which are scoped.
      * @return string  The attribute encoded as an XML-string.
      */
-    private function encAttribute($name, $values, $base64, $scopedAttributes)
+    private function encAttribute($name, array $values, $base64, array $scopedAttributes)
     {
-        assert(is_string($name));
-        assert(is_array($values));
-        assert(is_bool($base64));
-        assert(is_array($scopedAttributes));
+        Assert::string($name);
+        Assert::boolean($base64);
 
         if (in_array($name, $scopedAttributes, true)) {
             $scoped = true;

@@ -2,13 +2,13 @@
 
 namespace SimpleSAML;
 
-use SAML2\Constants as SAML2;
-
+use SAML2\Constants;
 use SimpleSAML\Auth;
 use SimpleSAML\Error;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
 use SimpleSAML\Module\saml\Error\NoPassive;
 use SimpleSAML\Utils;
+use Webmozart\Assert\Assert;
 
 /**
  * IdP class.
@@ -67,7 +67,7 @@ class IdP
      */
     private function __construct($id)
     {
-        assert(is_string($id));
+        Assert::string($id);
 
         $this->id = $id;
 
@@ -98,7 +98,7 @@ class IdP
                 // probably no SAML 2 IdP configured for this host. Ignore the error
             }
         } else {
-            assert(false);
+            Assert::true(false);
         }
 
         if ($this->associationGroup === null) {
@@ -134,7 +134,7 @@ class IdP
      */
     public static function getById($id)
     {
-        assert(is_string($id));
+        Assert::string($id);
 
         if (isset(self::$idpCache[$id])) {
             return self::$idpCache[$id];
@@ -155,7 +155,7 @@ class IdP
      */
     public static function getByState(array &$state)
     {
-        assert(isset($state['core:IdP']));
+        Assert::notNull($state['core:IdP']);
 
         return self::getById($state['core:IdP']);
     }
@@ -181,7 +181,7 @@ class IdP
      */
     public function getSPName($assocId)
     {
-        assert(is_string($assocId));
+        Assert::string($assocId);
 
         $prefix = substr($assocId, 0, 4);
         $spEntityId = substr($assocId, strlen($prefix) + 1);
@@ -223,8 +223,8 @@ class IdP
      */
     public function addAssociation(array $association)
     {
-        assert(isset($association['id']));
-        assert(isset($association['Handler']));
+        Assert::notNull($association['id']);
+        Assert::notNull($association['Handler']);
 
         $association['core:IdP'] = $this->id;
 
@@ -253,7 +253,7 @@ class IdP
      */
     public function terminateAssociation($assocId)
     {
-        assert(is_string($assocId));
+        Assert::string($assocId);
 
         $session = Session::getSessionFromRequest();
         $session->terminateAssociation($this->associationGroup, $assocId);
@@ -279,7 +279,7 @@ class IdP
      */
     public static function postAuthProc(array $state)
     {
-        assert(is_callable($state['Responder']));
+        Assert::isCallable($state['Responder']);
 
         if (isset($state['core:SP'])) {
             $session = Session::getSessionFromRequest();
@@ -292,7 +292,7 @@ class IdP
         }
 
         call_user_func($state['Responder'], $state);
-        assert(false);
+        Assert::true(false);
     }
 
 
@@ -355,7 +355,7 @@ class IdP
     private function authenticate(array &$state)
     {
         if (isset($state['isPassive']) && (bool) $state['isPassive']) {
-            throw new NoPassive(SAML2::STATUS_RESPONDER, 'Passive authentication not supported.');
+            throw new NoPassive(Constants::STATUS_RESPONDER, 'Passive authentication not supported.');
         }
 
         $this->authSource->login($state);
@@ -390,7 +390,7 @@ class IdP
      */
     public function handleAuthenticationRequest(array &$state)
     {
-        assert(isset($state['Responder']));
+        Assert::notNull($state['Responder']);
 
         $state['core:IdP'] = $this->id;
 
@@ -417,7 +417,7 @@ class IdP
         try {
             if ($needAuth) {
                 $this->authenticate($state);
-                assert(false);
+                Assert::true(false);
             } else {
                 $this->reauthenticate($state);
             }
@@ -467,11 +467,11 @@ class IdP
      */
     public function finishLogout(array &$state)
     {
-        assert(isset($state['Responder']));
+        Assert::notNull($state['Responder']);
 
         $idp = IdP::getByState($state);
         call_user_func($state['Responder'], $idp, $state);
-        assert(false);
+        Assert::true(false);
     }
 
 
@@ -487,8 +487,8 @@ class IdP
      */
     public function handleLogoutRequest(array &$state, $assocId)
     {
-        assert(isset($state['Responder']));
-        assert(is_string($assocId) || $assocId === null);
+        Assert::notNull($state['Responder']);
+        Assert::nullOrString($assocId);
 
         $state['core:IdP'] = $this->id;
         $state['core:TerminatedAssocId'] = $assocId;
@@ -507,7 +507,7 @@ class IdP
 
         $handler = $this->getLogoutHandler();
         $handler->startLogout($state, $assocId);
-        assert(false);
+        Assert::true(false);
     }
 
 
@@ -523,8 +523,8 @@ class IdP
      */
     public function handleLogoutResponse($assocId, $relayState, Error\Exception $error = null)
     {
-        assert(is_string($assocId));
-        assert(is_string($relayState) || $relayState === null);
+        Assert::string($assocId);
+        Assert::nullOrString($relayState);
 
         $session = Session::getSessionFromRequest();
         $session->deleteData('core:idp-ssotime', $this->id.';'.substr($assocId, strpos($assocId, ':') + 1));
@@ -532,7 +532,7 @@ class IdP
         $handler = $this->getLogoutHandler();
         $handler->onResponse($assocId, $relayState, $error);
 
-        assert(false);
+        Assert::true(false);
     }
 
 
@@ -546,7 +546,7 @@ class IdP
      */
     public function doLogoutRedirect($url)
     {
-        assert(is_string($url));
+        Assert::string($url);
 
         $state = [
             'Responder'       => ['\SimpleSAML\IdP', 'finishLogoutRedirect'],
@@ -554,7 +554,7 @@ class IdP
         ];
 
         $this->handleLogoutRequest($state, null);
-        assert(false);
+        Assert::true(false);
     }
 
 
@@ -569,9 +569,9 @@ class IdP
      */
     public static function finishLogoutRedirect(IdP $idp, array $state)
     {
-        assert(isset($state['core:Logout:URL']));
+        Assert::notNull($state['core:Logout:URL']);
 
         Utils\HTTP::redirectTrustedURL($state['core:Logout:URL']);
-        assert(false);
+        Assert::true(false);
     }
 }

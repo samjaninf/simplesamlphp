@@ -19,11 +19,11 @@ use SimpleSAML\Locale\Translate;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Utils;
-
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use Webmozart\Assert\Assert;
 
 class Template extends Response
 {
@@ -563,7 +563,7 @@ class Template extends Response
      */
     private function findTemplatePath($template, $throw_exception = true)
     {
-        assert(is_string($template));
+        Assert::string($template);
 
         list($templateModule, $templateName) = $this->findModuleAndTemplateName($template);
         $templateModule = ($templateModule !== null) ? $templateModule : 'default';
