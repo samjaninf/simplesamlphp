@@ -13,9 +13,9 @@ namespace SimpleSAML;
 class Logger
 {
     /**
-     * @var \SimpleSAML\Logger\LoggingHandlerInterface|false|null
+     * @var \SimpleSAML\Logger\LoggingHandlerInterface|false
      */
-    private static $loggingHandler = null;
+    private static $loggingHandler;
 
     /**
      * @var integer|null
@@ -383,7 +383,7 @@ class Logger
 
 
     /**
-     * @param \SimpleSAML\Logger\LoggingHandlerInterface|null $handler
+     * @param string|null $handler
      * @return void
      * @throws \Exception
      */
@@ -425,11 +425,13 @@ class Logger
             }
             $handler = $known_handlers[$handler];
         }
+        /** @var \SimpleSAML\Logger\LoggingHandlerInterface */
         self::$loggingHandler = new $handler($config);
 
         self::$format = $config->getString('logging.format', self::$format);
         self::$loggingHandler->setLogFormat(self::$format);
     }
+
 
     /**
      * @param int $level
@@ -446,7 +448,7 @@ class Logger
         } elseif (php_sapi_name() === 'cli' || defined('STDIN')) {
             // we are being executed from the CLI, nowhere to log
             if (is_null(self::$loggingHandler)) {
-                self::createLoggingHandler('SimpleSAML\Logger\StandardErrorLoggingHandler');
+                self::createLoggingHandler(\SimpleSAML\Logger\StandardErrorLoggingHandler::class);
             }
             $_SERVER['REMOTE_ADDR'] = "CLI";
             if (self::$trackid === self::NO_TRACKID) {
