@@ -340,9 +340,6 @@ msgstr "Kontakt"
 msgid "{errors:title_UNHANDLEDEXCEPTION}"
 msgstr "Nicht abgefangene Code-Exception"
 
-msgid "{status:validfor}"
-msgstr "Ihre Sitzung ist noch für %SECONDS% gültig."
-
 msgid "{status:header_saml20_sp}"
 msgstr "SAML 2.0 SP Demo Beispiel"
 
@@ -465,7 +462,7 @@ msgid "{general:no_cancel}"
 msgstr "Nein, ich stimme nicht zu"
 
 msgid "{login:user_pass_header}"
-msgstr "Bitten geben Sie ihren Nutzernamen und Passwort ein"
+msgstr "Bitte geben Sie Ihren Nutzernamen und Ihr Passwort ein"
 
 msgid "{errors:report_explain}"
 msgstr "Erläutern Sie, wodurch der Fehler auftrat..."
@@ -978,7 +975,7 @@ msgstr ""
 "Kopfzeile der SAML-Entität."
 
 msgid "Enter your username and password"
-msgstr "Bitten geben Sie ihren Nutzernamen und Passwort ein"
+msgstr "Bitte geben Sie Ihren Nutzernamen und Ihr Passwort ein"
 
 msgid "Login at"
 msgstr "Login bei"
@@ -1139,8 +1136,8 @@ msgstr ""
 "obige Fehlermeldung mit."
 
 #, python-format
-msgid "Your session is valid for %SECONDS% seconds from now."
-msgstr "Ihre Sitzung ist noch für %SECONDS% gültig."
+msgid "Your session is valid for %remaining% seconds from now."
+msgstr "Ihre Sitzung ist noch für %remaining% gültig."
 
 msgid "Domain component (DC)"
 msgstr "Domain-Komponente"

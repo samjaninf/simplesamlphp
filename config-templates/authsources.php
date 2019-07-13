@@ -20,7 +20,7 @@ $config = [
         // Can be NULL/unset, in which case an entity ID is generated based on the metadata URL.
         'entityID' => null,
 
-        // The entity ID of the IdP this should SP should contact.
+        // The entity ID of the IdP this SP should contact.
         // Can be NULL/unset, in which case the user will be shown a list of available IdPs.
         'idp' => null,
 
@@ -63,7 +63,7 @@ $config = [
 
     /*
     'example-static' => [
-        'exampleauth:Static',
+        'exampleauth:StaticSource',
         'uid' => ['testuser'],
         'eduPersonAffiliation' => ['member', 'employee'],
         'cn' => ['Test User'],
@@ -159,21 +159,6 @@ $config = [
         'key' => 'xxxxxxxxxxxxxxxx',
         'secret' => 'xxxxxxxxxxxxxxxx',
         'attributes' => 'id,first-name,last-name,headline,summary,specialties,picture-url,email-address',
-    ],
-    */
-
-    /*
-    // Twitter OAuth Authentication API.
-    // Register your application to get an API key here:
-    //  http://twitter.com/oauth_clients
-    'twitter' => [
-        'authtwitter:Twitter',
-        'key' => 'xxxxxxxxxxxxxxxx',
-        'secret' => 'xxxxxxxxxxxxxxxx',
-
-        // Forces the user to enter their credentials to ensure the correct users account is authorized.
-        // Details: https://dev.twitter.com/docs/api/1/get/oauth/authenticate
-        'force_login' => false,
     ],
     */
 

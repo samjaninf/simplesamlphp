@@ -154,14 +154,14 @@ msgstr ""
 
 msgid "{errors:descr_METADATA}"
 msgstr ""
-"SimplSAMLphp is niet goed geconfigureerd. De beheerder van deze dienst "
+"SimpleSAMLphp is niet goed geconfigureerd. De beheerder van deze dienst "
 "dient de metadata configuratie te controleren."
 
 msgid "{attributes:attribute_edupersonorgdn}"
 msgstr "Distinguished name (DN) van de organisatie van de persoon"
 
 msgid "{errors:title_BADREQUEST}"
-msgstr "Incorrect request ontvangen"
+msgstr "Incorrecte request ontvangen"
 
 msgid "{status:sessionsize}"
 msgstr "Sessiegrootte: %SIZE%"
@@ -341,9 +341,6 @@ msgstr "Contactinformatie"
 
 msgid "{errors:title_UNHANDLEDEXCEPTION}"
 msgstr "Onverwachte foutmelding"
-
-msgid "{status:validfor}"
-msgstr "Uw sessie is nog %SECONDS% seconden geldig vanaf dit moment."
 
 msgid "{status:header_saml20_sp}"
 msgstr "SAML 2.0 SP Demo"
@@ -1159,8 +1156,8 @@ msgstr ""
 "van deze authenticatiedienst, en geef bovenstaande melding door."
 
 #, python-format
-msgid "Your session is valid for %SECONDS% seconds from now."
-msgstr "Uw sessie is nog %SECONDS% seconden geldig vanaf dit moment."
+msgid "Your session is valid for %remaining% seconds from now."
+msgstr "Uw sessie is nog %remaining% seconden geldig vanaf dit moment."
 
 msgid "Domain component (DC)"
 msgstr "Domeincomponent"
@@ -1540,7 +1537,7 @@ msgid ""
 " are the administrator of this service, you should make sure your "
 "metadata configuration is correctly setup."
 msgstr ""
-"SimplSAMLphp is niet goed geconfigureerd. De beheerder van deze dienst "
+"SimpleSAMLphp is niet goed geconfigureerd. De beheerder van deze dienst "
 "dient de metadata configuratie te controleren."
 
 msgid "Incorrect username or password"
@@ -1680,4 +1677,4 @@ msgstr ""
 "Je gaat nu een pre-productiesysteem gebruiken. Deze authenticatie is "
 "uitsluitend opgezet voor testen en pre-productie-verfificatie. Als iemand"
 " je een link hierheen stuurde, en je bent geen <i>tester</i>, dan is dit "
-"waarschijlijk een vergissing en zou je <b>niet hier moeten zijn</b>."
+"waarschijnlijk een vergissing en zou je <b>niet hier moeten zijn</b>."

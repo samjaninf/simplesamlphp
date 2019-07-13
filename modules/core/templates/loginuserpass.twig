@@ -53,8 +53,8 @@
 
                 <div class="pure-control-group">
                     <label for="password">{{ 'Password'|trans}}</label>
-                    <input id="password" type="password" tabindex="2" name="password" class="edge"
-                    {%- if forceUsername or username %} autofocus {% endif %} />
+                    <input id="password" type="password" tabindex="2" name="password" class="edge" autocomplete="current-password"
+                    {%- if forceUsername or username %} autofocus {% endif %} >
 
                 {% if rememberMeEnabled -%}
                 </div>
@@ -98,13 +98,15 @@
 
             </div> <!-- form-align-->
             <br><br>
-            <button class="pure-button pure-button-red pure-input-1-2 pure-input-sm-1-1 right" id="submit_button" type="submit" tabindex="6">
-                {{ 'Login'|trans }}
-            </button>
-            <input type='hidden' id="processing_trans" value="{{ 'Processing...'|trans }}" />
-            {% for name, value in stateparams -%}
-                <input type="hidden" name="{{ name }}" value="{{ value }}" />
+            {%- for name, value in stateparams %}
+
+            <input type="hidden" name="{{ name }}" value="{{ value }}"/>
             {%- endfor %}
+
+            <button class="pure-button pure-button-red pure-input-1-2 pure-input-sm-1-1 right" id="submit_button"
+                    type="submit" tabindex="6" data-processing="{% trans %}Processing...{% endtrans %}">
+              {% trans %}Log in{% endtrans %}
+            </button>
         </form>
     </div><!--center-->
     {% if links -%}

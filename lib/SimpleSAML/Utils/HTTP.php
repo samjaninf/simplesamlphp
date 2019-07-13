@@ -1,11 +1,13 @@
 <?php
+
 namespace SimpleSAML\Utils;
 
 use SimpleSAML\Configuration;
+use SimpleSAML\Error;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Session;
-use SimpleSAML\Error;
+use SimpleSAML\XHTML\Template;
 
 /**
  * HTTP-related utility methods.
@@ -124,6 +126,27 @@ class HTTP
 
 
     /**
+     * Verify that a given URL is valid.
+     *
+     * @param string $url The URL we want to verify.
+     *
+     * @return boolean True if the given URL is valid, false otherwise.
+     */
+    public static function isValidURL($url)
+    {
+        $url = filter_var($url, FILTER_VALIDATE_URL);
+        if ($url === false) {
+            return false;
+        }
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+        if (is_string($scheme) && in_array(strtolower($scheme), ['http', 'https'], true)) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
      * This function redirects the user to the specified address.
      *
      * This function will use the "HTTP 303 See Other" redirection if the current request used the POST method and the
@@ -141,6 +164,7 @@ class HTTP
      *
      * @return void This function never returns.
      * @throws \InvalidArgumentException If $url is not a string or is empty, or $parameters is not an array.
+     * @throws \SimpleSAML\Error\Exception If $url is not a valid HTTP URL.
      *
      * @author Olav Morken, UNINETT AS <olav.morken@uninett.no>
      * @author Mads Freek Petersen
@@ -151,6 +175,10 @@ class HTTP
         if (!is_string($url) || empty($url) || !is_array($parameters)) {
             throw new \InvalidArgumentException('Invalid input parameters.');
         }
+        if (!self::isValidURL($url)) {
+            throw new Error\Exception('Invalid destination URL.');
+        }
+
         if (!empty($parameters)) {
             $url = self::addURLParameters($url, $parameters);
         }
@@ -327,7 +355,7 @@ class HTTP
         }
         $url = self::normalizeURL($url);
 
-        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+        if (!self::isValidURL($url)) {
             throw new Error\Exception('Invalid URL: '.$url);
         }
 
@@ -338,7 +366,6 @@ class HTTP
 
         // validates the URL's host is among those allowed
         if (is_array($trustedSites)) {
-            assert(is_array($trustedSites));
             $components = parse_url($url);
             $hostname = $components['host'];
 
@@ -462,8 +489,16 @@ class HTTP
 
         // data and headers
         if ($getHeaders) {
-            if (isset($http_response_header)) {
+            /**
+             * Remove for Psalm >=3.0.17
+             * @psalm-suppress UndefinedVariable
+             */
+            if (!empty($http_response_header)) {
                 $headers = [];
+                /**
+                 * Remove for Psalm >=3.0.17
+                 * @psalm-suppress UndefinedVariable
+                 */
                 foreach ($http_response_header as $h) {
                     if (preg_match('@^HTTP/1\.[01]\s+\d{3}\s+@', $h)) {
                         $headers = []; // reset
@@ -625,7 +660,7 @@ class HTTP
              */
             $c = $globalConfig->toArray();
             $c['baseurlpath'] = self::guessBasePath();
-            throw new \SimpleSAML\Error\CriticalConfigurationError(
+            throw new Error\CriticalConfigurationError(
                 'Invalid value for \'baseurlpath\' in config.php. Valid format is in the form: '.
                 '[(http|https)://(hostname|fqdn)[:port]]/[path/to/simplesaml/]. It must end with a \'/\'.',
                 null,
@@ -726,6 +761,7 @@ class HTTP
 
         return substr($url, $start, $length);
     }
+
 
     /**
      * Retrieve our own host together with the URL path. Please note this function will return the base URL for the
@@ -1134,9 +1170,9 @@ class HTTP
         // Do not set secure cookie if not on HTTPS
         if ($params['secure'] && !self::isHTTPS()) {
             if ($throw) {
-                throw new \SimpleSAML\Error\CannotSetCookie(
+                throw new Error\CannotSetCookie(
                     'Setting secure cookie on plain HTTP is not allowed.',
-                    \SimpleSAML\Error\CannotSetCookie::SECURE_COOKIE
+                    Error\CannotSetCookie::SECURE_COOKIE
                 );
             }
             Logger::warning('Error setting cookie: setting secure cookie on plain HTTP is not allowed.');
@@ -1146,17 +1182,17 @@ class HTTP
         if ($value === null) {
             $expire = time() - 365 * 24 * 60 * 60;
         } elseif (isset($params['expire'])) {
-            $expire = $params['expire'];
+            $expire = intval($params['expire']);
         } elseif ($params['lifetime'] === 0) {
             $expire = 0;
         } else {
-            $expire = time() + $params['lifetime'];
+            $expire = time() + intval($params['lifetime']);
         }
 
         if ($params['raw']) {
             $success = @setrawcookie(
                 $name,
-                $value,
+                strval($value),
                 $expire,
                 $params['path'],
                 $params['domain'],
@@ -1166,7 +1202,7 @@ class HTTP
         } else {
             $success = @setcookie(
                 $name,
-                $value,
+                strval($value),
                 $expire,
                 $params['path'],
                 $params['domain'],
@@ -1177,9 +1213,9 @@ class HTTP
 
         if (!$success) {
             if ($throw) {
-                throw new \SimpleSAML\Error\CannotSetCookie(
+                throw new Error\CannotSetCookie(
                     'Headers already sent.',
-                    \SimpleSAML\Error\CannotSetCookie::HEADERS_SENT
+                    Error\CannotSetCookie::HEADERS_SENT
                 );
             }
             Logger::warning('Error setting cookie: headers already sent.');
@@ -1196,6 +1232,7 @@ class HTTP
      * @param array  $data An associative array with the data to be posted to $destination.
      *
      * @throws \InvalidArgumentException If $destination is not a string or $data is not an array.
+     * @throws \SimpleSAML\Error\Exception If $destination is not a valid HTTP URL.
      *
      * @return void
      *
@@ -1208,6 +1245,9 @@ class HTTP
         if (!is_string($destination) || !is_array($data)) {
             throw new \InvalidArgumentException('Invalid input parameters.');
         }
+        if (!self::isValidURL($destination)) {
+            throw new Error\Exception('Invalid destination URL.');
+        }
 
         $config = Configuration::getInstance();
         $allowed = $config->getBoolean('enable.http_post', false);
@@ -1217,7 +1257,7 @@ class HTTP
             self::redirect(self::getSecurePOSTRedirectURL($destination, $data));
         }
 
-        $p = new \SimpleSAML\XHTML\Template($config, 'post.php');
+        $p = new Template($config, 'post.php');
         $p->data['destination'] = $destination;
         $p->data['post'] = $data;
         $p->show();

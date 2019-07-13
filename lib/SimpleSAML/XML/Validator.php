@@ -16,10 +16,10 @@ use SimpleSAML\Logger;
 class Validator
 {
     /**
-     * @var string This variable contains the X509 certificate the XML document
+     * @var string|null This variable contains the X509 certificate the XML document
      *             was signed with, or NULL if it wasn't signed with an X509 certificate.
      */
-    private $x509Certificate;
+    private $x509Certificate = null;
 
     /**
      * @var array|null This variable contains the nodes which are signed.
@@ -37,7 +37,7 @@ class Validator
      * - A string: Assumed to be a PEM-encoded certificate / public key.
      * - An array: Assumed to be an array returned by \SimpleSAML\Utils\Crypto::loadPublicKey.
      *
-     * @param \DOMNode $xmlNode The XML node which contains the Signature element.
+     * @param \DOMDocument $xmlNode The XML node which contains the Signature element.
      * @param string|array $idAttribute The ID attribute which is used in node references. If
      *          this attribute is NULL (the default), then we will use whatever is the default
      *          ID. Can be eigther a string with one value, or an array with multiple ID
@@ -47,7 +47,7 @@ class Validator
      */
     public function __construct($xmlNode, $idAttribute = null, $publickey = false)
     {
-        assert($xmlNode instanceof \DOMNode);
+        assert($xmlNode instanceof \DOMDocument);
 
         if ($publickey === null) {
             $publickey = false;
@@ -143,7 +143,7 @@ class Validator
      * This function will return the certificate as a PEM-encoded string. If the XML
      * wasn't signed by an X509 certificate, NULL will be returned.
      *
-     * @return string  The certificate as a PEM-encoded string, or NULL if not signed with an X509 certificate.
+     * @return string|null  The certificate as a PEM-encoded string, or NULL if not signed with an X509 certificate.
      */
     public function getX509Certificate()
     {
@@ -156,7 +156,7 @@ class Validator
      *
      * @param string $x509cert  The certificate as a base64-encoded string. The string may optionally
      *                          be framed with '-----BEGIN CERTIFICATE-----' and '-----END CERTIFICATE-----'.
-     * @return string  The fingerprint as a 40-character lowercase hexadecimal number. NULL is returned if the
+     * @return string|null  The fingerprint as a 40-character lowercase hexadecimal number. NULL is returned if the
      *                 argument isn't an X509 certificate.
      */
     private static function calculateX509Fingerprint($x509cert)
@@ -201,6 +201,7 @@ class Validator
      * @param string $certificate The X509 certificate we should validate.
      * @param array $fingerprints The valid fingerprints.
      * @throws \Exception
+     * @return void
      */
     private static function validateCertificateFingerprint($certificate, $fingerprints)
     {
@@ -239,6 +240,7 @@ class Validator
      * @param string|array $fingerprints  The fingerprints which should match. This can be a single string,
      *                                    or an array of fingerprints.
      * @throws \Exception
+     * @return void
      */
     public function validateFingerprint($fingerprints)
     {
@@ -275,12 +277,14 @@ class Validator
     {
         assert($node instanceof \DOMNode);
 
-        while ($node !== null) {
-            if (in_array($node, $this->validNodes, true)) {
-                return true;
-            }
+        if ($this->validNodes !== null) {
+            while ($node !== null) {
+                if (in_array($node, $this->validNodes, true)) {
+                    return true;
+                }
 
-            $node = $node->parentNode;
+                $node = $node->parentNode;
+            }
         }
 
         /* Neither this node nor any of the parent nodes could be found in the list of
@@ -297,6 +301,7 @@ class Validator
      *
      * @param string $caFile  File with trusted certificates, in PEM-format.
      * @throws \Exception
+     * @return void
      */
     public function validateCA($caFile)
     {
@@ -413,6 +418,7 @@ class Validator
      * @param string $certificate The certificate, in PEM format.
      * @param string $caFile File with trusted certificates, in PEM-format.
      * @throws \Exception
+     * @return void
      * @deprecated
      */
     public static function validateCertificate($certificate, $caFile)
@@ -434,8 +440,8 @@ class Validator
             if ($resExternal !== true) {
                 Logger::debug('Failed to validate with external function: '.var_export($resExternal, true));
                 throw new \Exception('Could not verify certificate against CA file "'.
-                    $caFile.'". Internal result:'.$resBuiltin.
-                    ' External result:'.$resExternal);
+                    $caFile.'". Internal result:'.var_export($resBuiltin, true).
+                    ' External result:'.var_export($resExternal, true));
             }
         }
 

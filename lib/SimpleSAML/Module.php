@@ -2,11 +2,15 @@
 
 namespace SimpleSAML;
 
+use SimpleSAML\HTTP\Router;
+use SimpleSAML\Utils;
+use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Helper class for accessing information about modules.
@@ -18,7 +22,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class Module
 {
-
     /**
      * Index pages: file names to attempt when accessing directories.
      *
@@ -166,12 +169,12 @@ class Module
 
         $config = Configuration::getInstance();
         if ($config->getBoolean('usenewui', false) === true) {
-            $router = new HTTP\Router($module);
+            $router = new Router($module);
             try {
                 return $router->process();
-            } catch (\Symfony\Component\Config\Exception\FileLocatorFileNotFoundException $e) {
+            } catch (FileLocatorFileNotFoundException $e) {
                 // no routes configured for this module, fall back to the old system
-            } catch (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e) {
+            } catch (NotFoundHttpException $e) {
                 // this module has been migrated, but the route wasn't found
             }
         }
@@ -273,6 +276,11 @@ class Module
     }
 
 
+    /**
+     * @param string $module
+     * @param array $mod_config
+     * @return bool
+     */
     private static function isModuleEnabledWithConf($module, $mod_config)
     {
         if (isset(self::$module_info[$module]['enabled'])) {
@@ -303,7 +311,7 @@ class Module
             !file_exists($moduleDir.'/default-enable') &&
             !file_exists($moduleDir.'/default-disable')
         ) {
-            \SimpleSAML\Logger::error("Missing default-enable or default-disable file for the module $module");
+            Logger::error("Missing default-enable or default-disable file for the module $module");
         }
 
         if (file_exists($moduleDir.'/enable')) {
@@ -392,20 +400,18 @@ class Module
         } else {
             // should be a module
             // make sure empty types are handled correctly
-            $type = (empty($type)) ? '_' : '_'.$type.'_';
+            $type = (empty($type)) ? '\\' : '\\'.$type.'\\';
 
-            // check for the old-style class names
-            $className = 'sspmod_'.$tmp[0].$type.$tmp[1];
-
+            $className = 'SimpleSAML\\Module\\'.$tmp[0].$type.$tmp[1];
             if (!class_exists($className)) {
-                // check for the new-style class names, using namespaces
-                $type = str_replace('_', '\\', $type);
-                $newClassName = 'SimpleSAML\\Module\\'.$tmp[0].$type.$tmp[1];
+                // check for the old-style class names
+                $type = str_replace('\\', '_', $type);
+                $oldClassName = 'sspmod_'.$tmp[0].$type.$tmp[1];
 
-                if (!class_exists($newClassName)) {
-                    throw new \Exception("Could not resolve '$id': no class named '$className' or '$newClassName'.");
+                if (!class_exists($oldClassName)) {
+                    throw new \Exception("Could not resolve '$id': no class named '$className' or '$oldClassName'.");
                 }
-                $className = $newClassName;
+                $className = $oldClassName;
             }
         }
 
@@ -487,6 +493,7 @@ class Module
      *
      * @param string $hook The name of the hook.
      * @param mixed  &$data The data which should be passed to each hook. Will be passed as a reference.
+     * @return void
      *
      * @throws \SimpleSAML\Error\Exception If an invalid hook is found in a module.
      */
@@ -513,7 +520,7 @@ class Module
             require_once(self::$module_info[$module]['hooks'][$hook]['file']);
 
             if (!is_callable(self::$module_info[$module]['hooks'][$hook]['func'])) {
-                throw new \SimpleSAML\Error\Exception('Invalid hook \''.$hook.'\' for module \''.$module.'\'.');
+                throw new Error\Exception('Invalid hook \''.$hook.'\' for module \''.$module.'\'.');
             }
 
             $fn = self::$module_info[$module]['hooks'][$hook]['func'];
