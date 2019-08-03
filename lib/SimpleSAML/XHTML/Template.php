@@ -160,6 +160,18 @@ class Template extends Response
 
 
     /**
+     * Return the base-URL of a module
+     *
+     * @param string $url
+     * @param array $params
+     * @return string
+     */
+    public function moduleURL($url, array $params = []) {
+        return Module::getModuleURL($url, $params);
+    }
+
+
+    /**
      * Return the URL of an asset, including a cache-buster parameter that depends on the last modification time of
      * the original file.
      *
@@ -299,10 +311,7 @@ class Template extends Response
         $twig = new Twig_Environment($loader, $options);
         $twig->addExtension(new Twig_Extensions_Extension_I18n());
 
-        $twig->addFunction('moduleURL', new \Twig_SimpleFunction('moduleURL', function ($url, $params = []) {
-            return Module::getModuleURL($url, $params);
-        }));
-
+        $twig->addFunction(new TwigFunction('moduleURL', [$this, 'moduleURL']));
 
         // initialize some basic context
         $langParam = $this->configuration->getString('language.parameter.name', 'language');

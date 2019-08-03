@@ -9,6 +9,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
@@ -19,10 +20,10 @@ class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
-    const VERSION = '1.17.0-DEV';
-    const VERSION_ID = 11700;
+    const VERSION = '1.18.0-DEV';
+    const VERSION_ID = 11800;
     const MAJOR_VERSION = 1;
-    const MINOR_VERSION = 17;
+    const MINOR_VERSION = 18;
     const RELEASE_VERSION = 00;
     const EXTRA_VERSION = 'DEV';
 
@@ -36,6 +37,10 @@ class Kernel extends BaseKernel
      */
     private $module;
 
+
+    /**
+     * @oaram string $module
+     */
     public function __construct($module)
     {
         $this->module = $module;
@@ -43,6 +48,10 @@ class Kernel extends BaseKernel
         parent::__construct('dev', false);
     }
 
+
+    /**
+     * @return string
+     */
     public function getCacheDir()
     {
         $configuration = Configuration::getInstance();
@@ -55,6 +64,10 @@ class Kernel extends BaseKernel
         return $configuration->getBaseDir().'/'. $cachePath;
     }
 
+
+    /**
+     * @return string
+     */
     public function getLogDir()
     {
         $configuration = Configuration::getInstance();
@@ -67,6 +80,7 @@ class Kernel extends BaseKernel
         return $configuration->getBaseDir().'/'. $loggingPath;
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -76,6 +90,7 @@ class Kernel extends BaseKernel
             new FrameworkBundle(),
         ];
     }
+
 
     /**
      * Get the module loaded in this kernel.
@@ -87,11 +102,13 @@ class Kernel extends BaseKernel
         return $this->module;
     }
 
+
     /**
      * Configures the container.
      *
      * @param ContainerBuilder $container
      * @param LoaderInterface $loader
+     * @return void
      */
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
@@ -109,10 +126,12 @@ class Kernel extends BaseKernel
         $this->registerModuleControllers($container);
     }
 
+
     /**
      * Import routes.
      *
      * @param RouteCollectionBuilder $routes
+     * @return void
      */
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
@@ -124,10 +143,12 @@ class Kernel extends BaseKernel
         }
     }
 
+
     /**
-     * @param $container
+     * @param ContainerBuilder $container
+     * @return void
      */
-    private function registerModuleControllers($container)
+    private function registerModuleControllers(ContainerBuilder $container)
     {
         try {
             $definition = new Definition();
@@ -139,7 +160,7 @@ class Kernel extends BaseKernel
                 return;
             }
 
-            $loader = new \Symfony\Component\DependencyInjection\Loader\DirectoryLoader(
+            $loader = new DirectoryLoader(
                 $container,
                 new FileLocator($controllerDir . '/')
             );
