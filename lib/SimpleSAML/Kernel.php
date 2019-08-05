@@ -45,7 +45,7 @@ class Kernel extends BaseKernel
     {
         $this->module = $module;
 
-        $env = getenv('SYMFONY_ENV') ?: (getenv('APP_ENV') ?: 'prod');
+        $env = getenv('APP_ENV') ?: (getenv('SYMFONY_ENV') ?: 'prod');
 
         parent::__construct($env, false);
     }
