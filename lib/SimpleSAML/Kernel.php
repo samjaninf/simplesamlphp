@@ -20,16 +20,6 @@ class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
-    const VERSION = '1.18.0-DEV';
-    const VERSION_ID = 11800;
-    const MAJOR_VERSION = 1;
-    const MINOR_VERSION = 18;
-    const RELEASE_VERSION = 00;
-    const EXTRA_VERSION = 'DEV';
-
-    const END_OF_MAINTENANCE = 'UNDEFINED';
-    const END_OF_LIFE = 'UNDEFINED';
-
     const CONFIG_EXTS = '.{php,xml,yaml,yml}';
 
     /**
