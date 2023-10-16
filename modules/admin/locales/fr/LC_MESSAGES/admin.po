@@ -15,14 +15,6 @@ msgstr "Test"
 msgid "Federation"
 msgstr "Fédération"
 
-#: /home/runner/work/simplesamlphp/simplesamlphp/modules/admin/src/Controller/Test.php:157
-#: /home/runner/work/simplesamlphp/simplesamlphp/modules/admin/src/Controller/Federation.php:182
-#: /home/runner/work/simplesamlphp/simplesamlphp/modules/admin/src/Controller/Federation.php:482
-#: /home/runner/work/simplesamlphp/simplesamlphp/modules/admin/src/Controller/Config.php:108
-#: /home/runner/work/simplesamlphp/simplesamlphp/modules/admin/src/Controller/Config.php:151
-msgid "Log out"
-msgstr "Déconnexion"
-
 #: /home/runner/work/simplesamlphp/simplesamlphp/modules/admin/src/Controller/Federation.php:162
 msgid "XML to SimpleSAMLphp metadata converter"
 msgstr "Convertisseur de métadonnées XML vers SimpleSAMLphp"
@@ -46,6 +38,14 @@ msgstr "ADFS SP métadonnées"
 #: /home/runner/work/simplesamlphp/simplesamlphp/modules/admin/src/Controller/Federation.php:174
 msgid "ADFS IdP metadata"
 msgstr "ADFS IdP métadonnées"
+
+#: /home/runner/work/simplesamlphp/simplesamlphp/modules/admin/src/Controller/Federation.php:182
+#: /home/runner/work/simplesamlphp/simplesamlphp/modules/admin/src/Controller/Federation.php:482
+#: /home/runner/work/simplesamlphp/simplesamlphp/modules/admin/src/Controller/Test.php:157
+#: /home/runner/work/simplesamlphp/simplesamlphp/modules/admin/src/Controller/Config.php:108
+#: /home/runner/work/simplesamlphp/simplesamlphp/modules/admin/src/Controller/Config.php:151
+msgid "Log out"
+msgstr "Déconnexion"
 
 #: /home/runner/work/simplesamlphp/simplesamlphp/modules/admin/src/Controller/Config.php:135
 msgid "Diagnostics on hostname, port and protocol"
@@ -168,23 +168,66 @@ msgstr "L'extension PHP cURL est manquante. Impossible de vérifier les mises à
 msgid "You are running an outdated version of SimpleSAMLphp. Please update to <a href=\"%latest%\">the latest version</a> as soon as possible."
 msgstr "Vous utilisez une version obsolète de SimpleSAMLphp. Veuillez mettre à jour vers <a href=\"%latest%\">la dernière version</a> dès que possible."
 
-msgid "Test Authentication Sources"
-msgstr "Tester les sources d'authentification"
+msgid "Metadata parser"
+msgstr "Analyseur de métadonnées"
+
+msgid "XML metadata"
+msgstr "Métadonnées XML"
+
+msgid "or select a file:"
+msgstr "ou sélectionner un fichier:"
+
+msgid "No file selected."
+msgstr "Aucun fichier sélectionné."
+
+msgid "Parse"
+msgstr "Analyser"
+
+msgid "Converted metadata"
+msgstr "Métadonnées converties"
+
+msgid "An error occurred"
+msgstr "Une erreur s'est produite"
+
+msgid "Content of jpegPhoto attribute"
+msgstr "Contenu de l'attribut jpegPhoto"
 
 msgid "SimpleSAMLphp installation page"
 msgstr "Page d'installation de SimpleSAMLphp"
 
-msgid "SimpleSAMLphp is installed in:"
-msgstr "SimpleSAMLphp est installé dans le répertoire:"
+msgid ""
+"Hi, this is the status page of SimpleSAMLphp. Here you can see if your session is timed out, how long\n"
+"     it lasts until it times out and all the attributes that are attached to your session."
+msgstr ""
+"Bonjour, voici la page d'état de SimpleSAMLphp. Ici, vous pouvez voir si votre session\n"
+"est expirée, sa durée de validité et tous les attributs qui y sont attachés."
 
-msgid "You are running version <kbd>%version%</kbd>."
-msgstr "Vous utilisez la version <kbd>%version%</kbd>\""
+msgid "Your session is valid for %remaining% seconds from now."
+msgstr "Votre session est encore valide pour %remaining% secondes."
 
-msgid "required"
-msgstr "requis"
+msgid "Your attributes"
+msgstr "Vos attributs"
 
-msgid "optional"
-msgstr "optionnel"
+msgid "Technical information"
+msgstr "Informations techniques"
+
+msgid "SAML Subject"
+msgstr "SAML Sujet"
+
+msgid "not set"
+msgstr "non défini"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "Authentication data"
+msgstr "Données d'authentification"
+
+msgid "Copy to clipboard"
+msgstr "Copier dans le presse-papiers"
+
+msgid "Logout"
+msgstr "Déconnexion"
 
 msgid "Deprecated"
 msgstr "Obsolète"
@@ -197,9 +240,6 @@ msgstr "Métadonnées SAML"
 
 msgid "You can get the metadata XML on a dedicated URL:"
 msgstr "Vous pouvez obtenir les métadonnées XML sur une URL dédiée:"
-
-msgid "Copy to clipboard"
-msgstr "Copier dans le presse-papiers"
 
 msgid "In SAML 2.0 Metadata XML format:"
 msgstr "Au format XML de métadonnées SAML 2.0:"
@@ -240,39 +280,8 @@ msgstr "Entité ID"
 msgid "Search"
 msgstr "Rechercher"
 
-msgid "Content of jpegPhoto attribute"
-msgstr "Contenu de l'attribut jpegPhoto"
-
-msgid ""
-"Hi, this is the status page of SimpleSAMLphp. Here you can see if your session is timed out, how long\n"
-"     it lasts until it times out and all the attributes that are attached to your session."
-msgstr ""
-"Bonjour, voici la page d'état de SimpleSAMLphp. Ici, vous pouvez voir si votre session\n"
-"est expirée, sa durée de validité et tous les attributs qui y sont attachés."
-
-msgid "Your session is valid for %remaining% seconds from now."
-msgstr "Votre session est encore valide pour %remaining% secondes."
-
-msgid "Your attributes"
-msgstr "Vos attributs"
-
-msgid "Technical information"
-msgstr "Informations techniques"
-
-msgid "SAML Subject"
-msgstr "SAML Sujet"
-
-msgid "not set"
-msgstr "non défini"
-
-msgid "Format"
-msgstr "Format"
-
-msgid "Authentication data"
-msgstr "Données d'authentification"
-
-msgid "Logout"
-msgstr "Déconnexion"
+msgid "Test Authentication Sources"
+msgstr "Tester les sources d'authentification"
 
 msgid "SimpleSAMLphp Show Metadata"
 msgstr "SimpleSAMLphp Afficher les métadonnées"
@@ -283,26 +292,17 @@ msgstr "Métadonnées"
 msgid "Back"
 msgstr "Retour"
 
-msgid "Metadata parser"
-msgstr "Analyseur de métadonnées"
+msgid "SimpleSAMLphp is installed in:"
+msgstr "SimpleSAMLphp est installé dans le répertoire:"
 
-msgid "XML metadata"
-msgstr "Métadonnées XML"
+msgid "You are running version <kbd>%version%</kbd>."
+msgstr "Vous utilisez la version <kbd>%version%</kbd>\""
 
-msgid "or select a file:"
-msgstr "ou sélectionner un fichier:"
+msgid "required"
+msgstr "requis"
 
-msgid "No file selected."
-msgstr "Aucun fichier sélectionné."
-
-msgid "Parse"
-msgstr "Analyser"
-
-msgid "Converted metadata"
-msgstr "Métadonnées converties"
-
-msgid "An error occurred"
-msgstr "Une erreur s'est produite"
+msgid "optional"
+msgstr "optionnel"
 
 msgid "Checking your PHP installation"
 msgstr "Vérification de votre installation de PHP"
