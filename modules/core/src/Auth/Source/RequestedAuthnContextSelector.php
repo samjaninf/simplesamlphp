@@ -108,7 +108,7 @@ class RequestedAuthnContextSelector extends AbstractSourceSelector
     protected function selectAuthSource(array &$state): string
     {
         $requestedContexts = $state['saml:RequestedAuthnContext'];
-        if ($requestedContexts['AuthnContextClassRef'] === null) {
+        if ($requestedContexts === null) {
             Logger::info(
                 "core:RequestedAuthnContextSelector:  no RequestedAuthnContext provided; selecting default authsource"
             );
